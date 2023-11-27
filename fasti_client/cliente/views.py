@@ -180,3 +180,80 @@ def del_cliente(request, id: int):
         
 
     return JsonResponse({}, status=response_usuarios.status_code)
+
+
+@csrf_exempt
+def get_turno_espera(request, id: int):
+    """
+    Obtiene toda la información para la pantalla de turno de espera
+
+    Args:
+        request (HttpRequest): request con body vacío 
+        id (int): ID de la persona a consultar
+    """
+    try:
+        url_usuarios = settings.URL_DB + "Usuarios?celular=eq." + str(id)
+        url_clientes = settings.URL_DB + "Clientes?celular=eq." + str(id)
+
+        cabeceras = {
+            "apikey" : settings.APIKEY,
+            "Authorization" : 'Bearer ' + settings.APIKEY,
+            "Content-Type" : "application/json",
+            "Prefer" : "return=minimal"
+        }
+
+        # consulta usuario y cliente
+        response_usuario = requests.get(url_usuarios, headers=cabeceras)
+        response_cliente = requests.get(url_clientes, headers=cabeceras)
+
+        # carga las respuestas
+        # 1 elemento -> [0]
+        data_usuario = json.loads(response_usuario.text)[0]
+        data_cliente = json.loads(response_cliente.text)[0]
+
+        # consulta fila
+        url_fila = settings.URL_DB + "Filas?id=eq." + str(data_cliente.get("fila"))
+        response_fila = requests.get(url_fila, headers=cabeceras)
+        data_fila = json.loads(response_fila.text)[0]
+
+        tiempoEspera = get_tiempo_espera(
+            data_fila.get("tiempoAcumulado"), 
+            data_fila.get("turnosResueltos"),
+            data_fila.get("turnoActual"),
+            data_cliente.get("turno")
+        )
+        
+        # organiza respuesta
+        payload = {
+            "turnoCliente" : data_cliente.get("turno"),
+            "tiempoEspera" : tiempoEspera,
+            "horaTurno" : data_cliente.get("horaTurno"),
+            "idFila" : data_cliente.get("fila"),
+            "nombreCliente" : data_usuario.get("nombre")
+        }
+
+        return JsonResponse(payload, status=200)
+    except:
+        return JsonResponse({}, status=500)
+
+
+def get_tiempo_espera(tAcc: int, res: int, act: int, cli: int) -> int:
+    """
+    Retorna la estimación de tiempo de espera para el cliente
+
+    Args:
+        tAcc (int): tiempo acumulado de espera de los turnos resueltos
+        res (int): # turnos resueltos / atendidos / cancelados
+        act (int): # turno actual en la fila
+        cli (int): # turno del cliente
+
+    Returns:
+        int: estimación de tiempo de espera para que el cliente pase
+    """
+
+    if res == 0:
+        return 0
+    else:
+        return int(tAcc/res * (cli - act))
+
+
