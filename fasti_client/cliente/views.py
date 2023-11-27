@@ -230,6 +230,7 @@ def get_turno_espera(request, id: int):
             "tiempoEspera" : tiempoEspera,
             "horaTurno" : data_cliente.get("horaTurno"),
             "idFila" : data_cliente.get("fila"),
+            "turnoActual": data_fila.get("turnoActual"),
             "nombreCliente" : data_usuario.get("nombre")
         }
 
