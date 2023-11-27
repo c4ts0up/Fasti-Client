@@ -63,7 +63,7 @@ def get_perfil(request, id: int):
         id (int): ID del cliente
     """
 
-    url = settings.URL_DB + 'Usuarios?celular=eq.' + str(id)
+    url = settings.URL_DB + 'Usuarios?celular=eq.' + str(id) + '&select=celular,nombre'
 
     cabeceras = {
         'apikey' : settings.APIKEY,
@@ -71,6 +71,7 @@ def get_perfil(request, id: int):
     }
 
     response = requests.get(url, headers=cabeceras)
+    print(response.text)
 
     return JsonResponse(supabase_parse_response(response))
 
