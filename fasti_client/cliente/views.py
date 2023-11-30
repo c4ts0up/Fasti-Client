@@ -217,6 +217,9 @@ def get_turno_espera(request, id: int):
         response_fila = requests.get(url_fila, headers=cabeceras)
         data_fila = json.loads(response_fila.text)[0]
 
+        print(data_fila)
+        print(data_cliente)
+
         tiempoEspera = get_tiempo_espera(
             data_fila.get("tiempoAcumulado"), 
             data_fila.get("turnosResueltos"),
@@ -224,6 +227,7 @@ def get_turno_espera(request, id: int):
             data_cliente.get("turno")
         )
         
+        print(tiempoEspera)
         # organiza respuesta
         payload = {
             "turnoCliente" : data_cliente.get("turno"),
@@ -252,7 +256,8 @@ def get_tiempo_espera(tAcc: int, res: int, act: int, cli: int) -> int:
     Returns:
         int: estimación de tiempo de espera para que el cliente pase
     """
-
+    print("Entra a get tiempo espera")
+    print(res)
     if res == 0:
         return 0
     else:

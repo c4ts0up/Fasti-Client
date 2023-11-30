@@ -22,5 +22,6 @@ urlpatterns = [
     path('hello/', views.hello_world),
     #path('<int:id>/', views.perfil),
     path('<int:id>/en-espera/', views.get_turno_espera),
-    path('<int:id>/perfil/', views.get_perfil)
+    path('<int:id>/perfil/', views.get_perfil),
+    #path('<int:id>/cancelar-turno', views.cancelar_turno)
 ]
