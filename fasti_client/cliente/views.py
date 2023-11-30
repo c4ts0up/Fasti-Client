@@ -227,12 +227,13 @@ def get_turno_espera(request, id: int):
             data_cliente.get("turno")
         )
         
-        print(tiempoEspera)
+        print(data_cliente.get("horaTurno"))
+        print(type(data_cliente.get("horaTurno")))
         # organiza respuesta
         payload = {
             "turnoCliente" : data_cliente.get("turno"),
             "tiempoEspera" : tiempoEspera,
-            "horaTurno" : data_cliente.get("horaTurno"),
+            "horaTurno" : data_cliente.get("horaTurno")[11:19],
             "idFila" : data_cliente.get("fila"),
             "turnoActual": data_fila.get("turnoActual"),
             "nombreCliente" : data_usuario.get("nombre")
